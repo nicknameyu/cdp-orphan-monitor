@@ -38,12 +38,12 @@ region=$(echo $CDP_ENV_META|jq -r .environment.region)
 CDP_INSTANCE_LIST=$(echo $CDP_ENV_META|jq -r '.environment.freeipa.instances[].instanceId')
 
 # Describe datalake to get instance IDs for datalake
-echo "[ INFO ]: Pulling CDP Datalake $DATALAKE_NAME info."
 DATALAKE_NAME=$(cdp datalake list-datalakes --environment-name $CDP_ENV_NAME|jq -r '.datalakes[].datalakeName')
 if [ $? -ne 0 ]; then
     echo "[ FATAL ]: Failed to get datalake name from environment $CDP_ENV_NAME. " 
     exit 4
 fi
+echo "[ INFO ]: Pulling CDP Datalake $DATALAKE_NAME info."
 DATALAKE_INSTANCES=$(cdp datalake describe-datalake --datalake-name $DATALAKE_NAME|jq -r '.datalake.instanceGroups[].instances[].id')
 if [ $? -ne 0 ]; then
     echo "[ FATAL ]: Failed describing datalake $DATALAKE_NAME. " 
@@ -59,8 +59,6 @@ DH_LIST=$(cdp datahub list-clusters --environment-name $CDP_ENV_NAME|jq -r '.clu
 for datahub in $DH_LIST
 do
     DH_INSTANCES=$(cdp datahub describe-cluster --cluster-name $datahub | jq -r '.cluster.instanceGroups[].instances[].id')
-    echo Datahub instances for $datahub: 
-    echo "$DH_INSTANCES"
     CDP_INSTANCE_LIST="$CDP_INSTANCE_LIST
         $DH_INSTANCES"
 done
