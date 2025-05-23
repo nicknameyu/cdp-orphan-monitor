@@ -39,6 +39,35 @@ Edit
 ```
 The script will output a list of snapshot IDs that are not associated with any AMIs.
 
+## Example output
+```
+cdp-orphan-monitor % bash check-aws-orphan.sh --environment-name dyu-aws-env-poc
+[ INFO ]: Pulling CDP Environment info.
+[ INFO ]: Pulling CDP Datalake dyu-aws-poc-datalake info.
+[ INFO ]: Pulling CDP Datahub instances.
+CDP Instance List:
+    i-0b80537aa3a07b3e9
+    i-0f33941477be5ec5f
+    i-030e65767a25e3da5
+    i-07e1b8b0d73d4c0c8
+    i-00ba67ff3857d4cdf
+    i-099dfd735473ea33c
+    i-021f799ee5ca460ec
+    i-08777857ea493e21a
+[ INFO ]: Pulling AWS instances on the CDP subnets.
+AWS Instance List:
+    i-0ab3d0815805e1b83
+    i-08777857ea493e21a
+    i-07e1b8b0d73d4c0c8
+    i-030e65767a25e3da5
+    i-0f33941477be5ec5f
+    i-0b80537aa3a07b3e9
+    i-00ba67ff3857d4cdf
+    i-099dfd735473ea33c
+    i-021f799ee5ca460ec
+Ophan instances tags:
+i-0ab3d0815805e1b83: usecase: testing; owner: dyu; Name: dyu-cdp-jump
+```
 
 ## Notes
 - Dry Run: This script only identifies orphaned snapshots. It does not delete them. Review the list before taking any action.
