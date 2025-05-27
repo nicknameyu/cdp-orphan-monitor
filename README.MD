@@ -1,6 +1,6 @@
 # check-aws-orphan.sh
 
-A Bash script to identify and report orphaned AWS EC2 snapshots—snapshots that are no longer associated with any Amazon Machine Images (AMIs). Orphaned snapshots can accumulate over time, leading to unnecessary storage costs. This script aids in pinpointing such snapshots for potential cleanup.
+A Bash script to identify and report orphaned AWS EC2 intances on CDP subnets that is not related to CDP environment. This script aids in pinpointing such instances for potential cleanup.
 
 ## Features
 
