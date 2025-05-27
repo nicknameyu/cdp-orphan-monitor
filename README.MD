@@ -4,7 +4,7 @@ A Bash script to identify and report orphaned AWS EC2 intances on CDP subnets th
 
 ## Features
 
-- **Identification of Orphaned Instances**: Lists all EC2 instances on CDP subnets.
+- **Identification of Orphaned Instances**: Lists all orphaned EC2 instances on CDP subnets.
 - **Cost Optimization**: Helps in reducing AWS compute costs by identifying unused instances.
 - **Automation Friendly**: Can be integrated into cron jobs or CI/CD pipelines for regular monitoring.
 
