@@ -38,7 +38,7 @@ Copy
 Edit
 ./check-aws-orphan.sh
 ```
-The script will output a list of snapshot IDs that are not associated with any AMIs.
+The script will output a list of orphan instance IDs that are on the CDP subnets.
 
 ## Example output
 ```
@@ -71,9 +71,9 @@ i-0ab3d0815805e1b83: usecase: testing; owner: dyu; Name: dyu-cdp-jump
 ```
 
 ## Notes
-- Dry Run: This script only identifies orphaned snapshots. It does not delete them. Review the list before taking any action.
+- Dry Run: This script only identifies orphaned instance IDs. It does not delete them. Review the list before taking any action.
 
-- Permissions: Ensure that the AWS CLI is configured with credentials that have permissions to describe snapshots and images.
+- Permissions: Ensure that the AWS CLI is configured with credentials that have permissions to describe instances.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
@@ -82,4 +82,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
 ## Disclaimer
-Use this script at your own risk. Always ensure that you have backups and have reviewed the snapshots before deletion.
+Use this script at your own risk. Always ensure that you have backups and have reviewed the instances before deletion.
