@@ -4,8 +4,8 @@ A Bash script to identify and report orphaned AWS EC2 snapshots—snapshots that
 
 ## Features
 
-- **Identification of Orphaned Snapshots**: Lists all EC2 snapshots in your AWS account that are not linked to any AMIs.
-- **Cost Optimization**: Helps in reducing AWS storage costs by identifying unused snapshots.
+- **Identification of Orphaned Instances**: Lists all EC2 instances on CDP subnets.
+- **Cost Optimization**: Helps in reducing AWS compute costs by identifying unused instances.
 - **Automation Friendly**: Can be integrated into cron jobs or CI/CD pipelines for regular monitoring.
 
 ## Prerequisites
@@ -14,6 +14,7 @@ A Bash script to identify and report orphaned AWS EC2 snapshots—snapshots that
 - **Bash Shell**: The script is written in Bash and requires a Unix-like environment.
 - **CDP CLI**: Ensure that the Cloudera CDP Command Line Interface is installed and configured with appropriate permissions.
 - **jq**: Ensure that the jq is installed and configured with appropriate permissions.
+- **Login status**: CDP and AWS CLI need to be in login status before launching this script.
 
 ## Usage
 
