@@ -27,15 +27,11 @@ cd cdp-orphan-monitor
 2. **Make the Script Executable**:
 
 ```bash
-Copy
-Edit
 chmod +x check-aws-orphan.sh
 ```
 3. **Run the Script**:
 
 ```bash
-Copy
-Edit
 ./check-aws-orphan.sh
 ```
 The script will output a list of orphan instance IDs that are on the CDP subnets.
