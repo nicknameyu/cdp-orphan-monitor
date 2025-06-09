@@ -1,20 +1,32 @@
-#!/bin/hash
+#!/bin/bash
 
 # Initialize variables
 CDP_ENV_NAME=""
 
 # Parse command line arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --environment-name)
-      CDP_ENV_NAME="$2"
-      shift 2
-      ;;
-    *)
-      echo "Unknown option: $1"
-      exit 1
-      ;;
-  esac
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --environment-name)
+            CDP_ENV_NAME="$2"
+            shift # Shift past the flag
+            shift # Shift past the value
+            ;;
+        --cdp-profile)
+            CDP_PROFILE="$2"
+            shift # Shift past the flag
+            shift # Shift past the value
+            ;;
+        --aws-profile)
+            AWS_PROFILE="$2"
+            shift # Shift past the flag
+            shift # Shift past the value
+            ;;
+        *)
+            echo "Unknown parameter passed: $1"
+            echo "Usage: $0 --environment-name <name> --cdp-profile <profile> --aws-profile <profile>"
+            exit 1
+            ;;
+    esac
 done
 
 while [ -z "$CDP_ENV_NAME" ]; do
@@ -24,10 +36,11 @@ done
 
 CDP_INSTANCE_LIST=()
 # Describe CDP environment and retrieve freeipa instance IDs, subnets
+
 echo "[ INFO ]: Pulling CDP Environment info."
-CDP_ENV_META=$(cdp environments describe-environment --environment-name $CDP_ENV_NAME)
+CDP_ENV_META=$(cdp --profile $CDP_PROFILE environments describe-environment --environment-name $CDP_ENV_NAME)
 if [ $? -ne 0 ]; then
-    echo "[ FATAL ]: Failed describing environment $CDP_ENV_NAME. " 
+    echo "[ FATAL ]: Failed describing environment $CDP_ENV_NAME. "
     exit 3
 fi
 
@@ -38,27 +51,27 @@ region=$(echo $CDP_ENV_META|jq -r .environment.region)
 CDP_INSTANCE_LIST=$(echo $CDP_ENV_META|jq -r '.environment.freeipa.instances[].instanceId')
 
 # Describe datalake to get instance IDs for datalake
-DATALAKE_NAME=$(cdp datalake list-datalakes --environment-name $CDP_ENV_NAME|jq -r '.datalakes[].datalakeName')
+DATALAKE_NAME=$(cdp --profile $CDP_PROFILE datalake list-datalakes --environment-name $CDP_ENV_NAME|jq -r '.datalakes[].datalakeName')
 if [ $? -ne 0 ]; then
-    echo "[ FATAL ]: Failed to get datalake name from environment $CDP_ENV_NAME. " 
+    echo "[ FATAL ]: Failed to get datalake name from environment $CDP_ENV_NAME. "
     exit 4
 fi
 echo "[ INFO ]: Pulling CDP Datalake $DATALAKE_NAME info."
-DATALAKE_INSTANCES=$(cdp datalake describe-datalake --datalake-name $DATALAKE_NAME|jq -r '.datalake.instanceGroups[].instances[].id')
+DATALAKE_INSTANCES=$(cdp --profile $CDP_PROFILE datalake describe-datalake --datalake-name $DATALAKE_NAME|jq -r '.datalake.instanceGroups[].instances[].id')
 if [ $? -ne 0 ]; then
-    echo "[ FATAL ]: Failed describing datalake $DATALAKE_NAME. " 
+    echo "[ FATAL ]: Failed describing datalake $DATALAKE_NAME. "
     exit 5
 fi
 
 CDP_INSTANCE_LIST="$CDP_INSTANCE_LIST
     $DATALAKE_INSTANCES"
 
-# Retrieve DH clusters on this environments and get the list of instances 
+# Retrieve DH clusters on this environments and get the list of instances
 echo "[ INFO ]: Pulling CDP Datahub instances."
-DH_LIST=$(cdp datahub list-clusters --environment-name $CDP_ENV_NAME|jq -r '.clusters[].clusterName')
+DH_LIST=$(cdp --profile $CDP_PROFILE datahub list-clusters --environment-name $CDP_ENV_NAME|jq -r '.clusters[].clusterName')
 for datahub in $DH_LIST
 do
-    DH_INSTANCES=$(cdp datahub describe-cluster --cluster-name $datahub | jq -r '.cluster.instanceGroups[].instances[].id')
+    DH_INSTANCES=$(cdp --profile $CDP_PROFILE datahub describe-cluster --cluster-name $datahub | jq -r '.cluster.instanceGroups[].instances[].id')
     CDP_INSTANCE_LIST="$CDP_INSTANCE_LIST
         $DH_INSTANCES"
 done
@@ -73,7 +86,7 @@ done
 echo "[ INFO ]: Pulling AWS instances on the CDP subnets."
 filter=$(echo "$SUBNETS" | paste -sd "," -)
 
-AWS_INSTANCES=$(aws ec2 describe-instances \
+AWS_INSTANCES=$(aws --profile $AWS_PROFILE ec2 describe-instances \
   --region "$region" \
   --filters "Name=subnet-id,Values=$filter" \
   --query 'Reservations[*].Instances[*].[InstanceId]'| jq -r '.[][][]')
@@ -103,10 +116,10 @@ else
     echo Ophan instances tags:
     for instance in $ophan_list
     do
-        tags=$(aws ec2 describe-instances \
+        tags=$(aws --profile $AWS_PROFILE ec2 describe-instances \
             --region "$region" \
             --instance-ids $instance \
             --query 'Reservations[*].Instances[*].[InstanceId,Tags]'| jq -r '.[][]')
-        echo $tags | jq -r ' . as [$id, $tags] |$id + ": " + ($tags | map("\(.Key): \(.Value)") | join("; "))' 
+        echo $tags | jq -r ' . as [$id, $tags] |$id + ": " + ($tags | map("\(.Key): \(.Value)") | join("; "))'
     done
 fi
